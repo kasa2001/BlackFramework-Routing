@@ -68,10 +68,6 @@ class DefaultRouter implements IRouter
 
     /**
      * {@inheritDoc}
-     * @param $controller
-     * @param $method
-     * @param array $parameters
-     * @return mixed
      * @throws NotFound if class or method not found
      */
     public function execute($controller, $action, $parameters = [])

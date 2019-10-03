@@ -8,11 +8,11 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         bootstrap="tests/bootstrap.php"
+         bootstrap="test/bootstrap.php"
 >
     <testsuites>
         <testsuite name="Router">
-            <directory suffix="RouterTest.php">./tests/unit/src/Core</directory>
+            <directory suffix="DefaultRouterTest.php">./test/unit/src/Router</directory>
         </testsuite>
     </testsuites>
 
@@ -21,10 +21,6 @@
             <group>slow</group>
         </exclude>
     </groups>
-
-    <listeners>
-        <listener class="Unit\Listeners\AutoLoaderCaseListener" />
-    </listeners>
 
 
     <filter>

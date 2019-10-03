@@ -32,12 +32,15 @@ class DefaultRouterTest extends TestCase
 
         $this->service->configure(
             [
+                //Controller namespace
                 'controller' => 'Unit\\Mock',
+                //Controller constructor params
                 'controller-params' => [
                     ControllerMock::class => [
                         ServiceMock::class
                     ]
                 ],
+                //Route definition
                 'route-definition' => [
                     '{controller}/{method}/{id}'
                 ]
@@ -51,6 +54,10 @@ class DefaultRouterTest extends TestCase
      */
     public function testExecute()
     {
+        $this->factory->method('createObject')
+            ->willReturn(new ControllerMock(new ServiceMock()));
+
+
         $actual = $this->service->execute(
             ControllerMock::class,
             'index',
