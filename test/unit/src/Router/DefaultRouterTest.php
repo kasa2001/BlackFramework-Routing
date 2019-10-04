@@ -9,6 +9,8 @@ use BlackFramework\Routing\Exception\RouterException;
 use BlackFramework\Routing\Factory\IFactory;
 use BlackFramework\Routing\Parser\WebParser;
 use BlackFramework\Routing\Router\DefaultRouter;
+use BlackFramework\Routing\Router\IRouter;
+use phpDocumentor\Reflection\Types\Integer;
 use PHPUnit\Framework\TestCase;
 use Unit\Mock\ControllerMock;
 use Unit\Mock\ServiceMock;
@@ -32,17 +34,49 @@ class DefaultRouterTest extends TestCase
 
         $this->service->configure(
             [
-                //Controller namespace
-                'controller' => 'Unit\\Mock',
                 //Controller constructor params
                 'controller-params' => [
                     ControllerMock::class => [
-                        ServiceMock::class
-                    ]
+                        ServiceMock::class,
+                    ],
                 ],
                 //Route definition
                 'route-definition' => [
-                    '{controller}/{method}/{id}'
+                    //method
+                    'GET' => [
+                        //route
+                        'home' => [
+                            'index' => [
+                                'controller' => ControllerMock::class,
+                                'action' => 'select',
+                                //Required parameters in url
+                                'required' => [
+                                    // type => pattern
+                                    'id' => '\d+',
+                                    'character' => IRouter::KEYWORD
+                                ],
+                                'optional' => [
+
+                                ],
+                                'query' => [
+                                    "index",
+                                ],
+                            ],
+                        ],
+                    ],
+                    'POST' => [
+
+                    ],
+                    'PUT' => [
+
+                    ],
+                ],
+                'default-route' => [
+                    'controller' => ControllerMock::class,
+                    'action' => 'index',
+                    'parameters' => [
+
+                    ],
                 ]
             ]
         );
