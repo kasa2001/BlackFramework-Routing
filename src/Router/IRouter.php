@@ -5,6 +5,8 @@ namespace BlackFramework\Routing\Router;
 
 interface IRouter
 {
+    const KEYWORD = -1;
+
     /**
      * Method select Controller and method
      * @return array

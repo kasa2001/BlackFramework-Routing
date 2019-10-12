@@ -21,11 +21,6 @@ class Method implements IPart
         $this->type = $type;
     }
 
-    public function checkPart(IPart $part): bool
-    {
-        return $this->type == $part->getPart();
-    }
-
     public function getPart()
     {
         return $this->type;

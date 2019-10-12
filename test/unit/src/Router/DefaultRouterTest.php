@@ -10,7 +10,6 @@ use BlackFramework\Routing\Factory\IFactory;
 use BlackFramework\Routing\Parser\WebParser;
 use BlackFramework\Routing\Router\DefaultRouter;
 use BlackFramework\Routing\Router\IRouter;
-use phpDocumentor\Reflection\Types\Integer;
 use PHPUnit\Framework\TestCase;
 use Unit\Mock\ControllerMock;
 use Unit\Mock\ServiceMock;
@@ -44,23 +43,21 @@ class DefaultRouterTest extends TestCase
                 'route-definition' => [
                     //method
                     'GET' => [
-                        //route
-                        'home' => [
-                            'index' => [
-                                'controller' => ControllerMock::class,
-                                'action' => 'select',
-                                //Required parameters in url
-                                'required' => [
-                                    // type => pattern
-                                    'id' => '\d+',
-                                    'character' => IRouter::KEYWORD
-                                ],
-                                'optional' => [
+                        //route pattern
+                        'home/index/\d+/character' => [
+                            'controller' => ControllerMock::class,
+                            'action' => 'select',
+                            //Required parameters in url
+                            'required' => [
+                                // type => pattern
+                                'id' => '\d+',
+                                'character' => IRouter::KEYWORD,
+                            ],
+                            'optional' => [
 
-                                ],
-                                'query' => [
-                                    "index",
-                                ],
+                            ],
+                            'query' => [
+                                "index",
                             ],
                         ],
                     ],
@@ -133,5 +130,11 @@ class DefaultRouterTest extends TestCase
                 "a"
             ]
         );
+    }
+
+    public function testChoose()
+    {
+
+        $this->assertTrue(true);
     }
 }

@@ -18,11 +18,6 @@ class Segment implements IPart
         $this->segment = $segment;
     }
 
-    public function checkPart(IPart $part): bool
-    {
-        return false;
-    }
-
     public function getPart()
     {
         return $this->segment;

@@ -4,6 +4,8 @@
 namespace Unit\Mock;
 
 
+use BlackFramework\Routing\Container\WebContainer;
+
 class ControllerMock
 {
     /**
@@ -19,5 +21,10 @@ class ControllerMock
     public function index()
     {
         return "a";
+    }
+
+    public function select(int $id, WebContainer $container)
+    {
+
     }
 }

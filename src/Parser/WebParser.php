@@ -22,7 +22,8 @@ class WebParser implements IParser
     {
         $this->container = new WebContainer(
             new Segment(
-                explode('/',
+                explode(
+                    '/',
                     trim($_SERVER['REDIRECT_URL'] ?? '', '/')
                 )
             ),
@@ -48,7 +49,6 @@ class WebParser implements IParser
     {
         return $this->container;
     }
-
 
     private function getAllHeaders(): array
     {

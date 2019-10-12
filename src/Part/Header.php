@@ -20,15 +20,6 @@ class Header implements IPart
     }
 
     /**
-     * @param IPart $part
-     * @return bool
-     */
-    public function checkPart(IPart $part): bool
-    {
-        return false;
-    }
-
-    /**
      * @return array|mixed
      */
     public function getPart()

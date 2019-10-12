@@ -18,11 +18,6 @@ class Query implements IPart
         $this->query = $request;
     }
 
-    public function checkPart(IPart $part): bool
-    {
-        return false;
-    }
-
     public function getPart()
     {
         return $this->query;
