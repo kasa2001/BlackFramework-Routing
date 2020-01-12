@@ -23,6 +23,12 @@ class RouterException extends Exception
     const IM_A_TEAPOT = 418;
 
     /**
+     * Server errors
+     */
+    const INTERNAL_SERVER_ERROR = 500;
+
+
+    /**
      * Messages
      */
     const BAD_REQUEST_MESSAGE = "Bad Request";
@@ -36,5 +42,10 @@ class RouterException extends Exception
      * Easter egg message
      */
     const IM_A_TEAPOT_MESSAGE = "I'm a Teapot";
+
+    /**
+     * Server errors message
+     */
+    const INTERNAL_SERVER_ERROR_MESSAGE = "Internal Server Error";
 
 }

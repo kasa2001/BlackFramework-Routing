@@ -4,11 +4,14 @@
 namespace BlackFramework\Routing\Router;
 
 use BlackFramework\Routing\Exception\BadRequest;
+use BlackFramework\Routing\Exception\InternalServerError;
 use BlackFramework\Routing\Exception\RouterException;
 use BlackFramework\Routing\Exception\NotFound;
 use BlackFramework\Routing\Factory\IFactory;
 use BlackFramework\Routing\Parser\IParser;
 use BlackFramework\Routing\Parser\WebParser;
+use BlackFramework\Routing\Repository\Exception\RepositoryException;
+use BlackFramework\Routing\Repository\IRepository;
 
 use ReflectionClass;
 use ReflectionException;
@@ -30,10 +33,16 @@ class DefaultRouter implements IRouter
      */
     private $factory;
 
-    public function __construct(IParser $parser, IFactory $factory)
+    /**
+     * @var IFactory
+     */
+    private $entityFactory;
+
+    public function __construct(IParser $parser, IFactory $factory, IFactory $entityFactory)
     {
         $this->parser = $parser;
         $this->factory = $factory;
+        $this->entityFactory = $entityFactory;
     }
 
     /**
@@ -62,12 +71,14 @@ class DefaultRouter implements IRouter
      * Keys in array:
      * ['router-definition'] Route Definition. Default config: '^/{controller}/{method}$'
      * ['controller-params'] Controller parameters type to create controller class
+     * default configuration {domain}/{controller}/{method}/{param1}/{param2} ...
      * @param array $configuration
      */
     public function configure(array $configuration): void
     {
         $this->configuration['controller-params'] = $configuration['controller-params'] ?? [];
         $this->configuration['route-definition'] = $configuration['route-definition'] ?? [];
+        $this->configuration['default-route'] = $this->configuration['default-route'] ?? [];
     }
 
     /**
@@ -100,7 +111,7 @@ class DefaultRouter implements IRouter
      * @param array $segment
      * @param array $query
      * @return array
-     * @throws BadRequest
+     * @throws RouterException
      */
     private function findRoute(string $method = "GET", array $segment = [], array $query = []): array
     {
@@ -143,6 +154,46 @@ class DefaultRouter implements IRouter
         }
 
         return $this->configuration['default-route'];
+    }
+
+    /**
+     * @param $required
+     * @return array
+     * @throws RouterException
+     */
+    private function buildParams($required)
+    {
+        $i = 2;
+        $segment = $this->parser->getContainer()->getSegment()->getPart();
+
+        $params = [];
+        try {
+
+            foreach ($required as $key => $item) {
+                if ($item != IRouter::KEYWORD) {
+                    $repository = new $key();
+
+                    if (in_array(IRepository::class, class_implements($repository))) {
+                        throw new InternalServerError();
+                    }
+                    $params[] = $this->entityFactory->createObject(
+                        new ReflectionClass($item),
+                        $repository->findEntity([
+                            'url' => $segment[$i]
+                        ])
+                    );
+                }
+                $i++;
+            }
+        } catch (ReflectionException $e) {
+            throw new BadRequest();
+        } catch (RepositoryException $e) {
+            throw new NotFound();
+        }
+
+        $params[] = $this->parser->getContainer();
+
+        return $params;
     }
 
     /**
