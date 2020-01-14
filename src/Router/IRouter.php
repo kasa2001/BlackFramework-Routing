@@ -27,4 +27,11 @@ interface IRouter
      * @return mixed
      */
     public function execute($controller, $method, $parameters = []);
+
+    /**
+     * @param int $code
+     * @param string $applicationPath
+     * @return string
+     */
+    public function executeException(int $code, string $applicationPath);
 }

@@ -22,6 +22,4 @@ class Segment implements IPart
     {
         return $this->segment;
     }
-
-
 }

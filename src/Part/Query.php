@@ -23,9 +23,8 @@ class Query implements IPart
         return $this->query;
     }
 
-
-    public function toString()
+    public function getElement($key)
     {
-        return '';
+        return $this->query[$key];
     }
 }

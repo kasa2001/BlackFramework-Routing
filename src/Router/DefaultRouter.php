@@ -10,8 +10,6 @@ use BlackFramework\Routing\Exception\NotFound;
 use BlackFramework\Routing\Factory\IFactory;
 use BlackFramework\Routing\Parser\IParser;
 use BlackFramework\Routing\Parser\WebParser;
-use BlackFramework\Routing\Repository\Exception\RepositoryException;
-use BlackFramework\Routing\Repository\IRepository;
 
 use ReflectionClass;
 use ReflectionException;
@@ -33,16 +31,10 @@ class DefaultRouter implements IRouter
      */
     private $factory;
 
-    /**
-     * @var IFactory
-     */
-    private $entityFactory;
-
-    public function __construct(IParser $parser, IFactory $factory, IFactory $entityFactory)
+    public function __construct(IParser $parser, IFactory $factory)
     {
         $this->parser = $parser;
         $this->factory = $factory;
-        $this->entityFactory = $entityFactory;
     }
 
     /**
@@ -71,6 +63,8 @@ class DefaultRouter implements IRouter
      * Keys in array:
      * ['router-definition'] Route Definition. Default config: '^/{controller}/{method}$'
      * ['controller-params'] Controller parameters type to create controller class
+     * ['default-route'] Default route definition
+     * ['controller-namespace'] Controller namespace
      * default configuration {domain}/{controller}/{method}/{param1}/{param2} ...
      * @param array $configuration
      */
@@ -78,12 +72,14 @@ class DefaultRouter implements IRouter
     {
         $this->configuration['controller-params'] = $configuration['controller-params'] ?? [];
         $this->configuration['route-definition'] = $configuration['route-definition'] ?? [];
-        $this->configuration['default-route'] = $this->configuration['default-route'] ?? [];
+        $this->configuration['default-route'] = $configuration['default-route'] ?? [];
+        $this->configuration['controller-namespace'] = $configuration['controller-namespace'] ?? "App\\Controller\\";
     }
 
     /**
      * {@inheritDoc}
      * @throws NotFound if class or method not found
+     * @throws InternalServerError if config or controller is wrong
      */
     public function execute($controller, $action, $parameters = [])
     {
@@ -98,12 +94,29 @@ class DefaultRouter implements IRouter
             throw new NotFound();
         }
 
-        $object = $this->factory->createObject(
-            $class,
-            $this->configuration['controller-params'][$controller]
-        );
+        try {
+            $object = $this->factory->createObject(
+                $class,
+                $this->configuration['controller-params'][$controller]
+            );
 
-        return $object->$action(...$parameters);
+            return $object->$action(...$parameters);
+        }  catch (ReflectionException $e) {
+            throw new InternalServerError();
+        }
+    }
+
+    /**
+     * @param int $code
+     * @param string $applicationPath
+     * @return false|string
+     */
+    public function executeException(int $code, string $applicationPath)
+    {
+        ob_flush();
+        ob_start();
+        include $applicationPath . "/public/error/error" . $code . ".html";
+        return ob_get_clean();
     }
 
     /**
@@ -111,23 +124,24 @@ class DefaultRouter implements IRouter
      * @param array $segment
      * @param array $query
      * @return array
-     * @throws RouterException
+     * @throws BadRequest if request is incomplete
      */
     private function findRoute(string $method = "GET", array $segment = [], array $query = []): array
     {
         if (count($segment)) {
             $pattern = $this->pregPattern(
-                array_keys($this->configuration[$method]),
+                array_keys($this->configuration['route-definition'][$method]),
                 implode("/", $segment)
             );
 
-            $route = $this->configuration[$method][$pattern] ?? 0;
+            $route = $this->configuration['route-definition'][$method][$pattern] ?? 0;
+
 
             if (!$route) {
                 //Get default controller and method (from URL address)
                 return [
-                    'controller' => $segment[0],
-                    'method' => $segment[1] ?? 'index',
+                    'controller' => $this->configuration['controller-namespace'] . ucfirst($segment[0]),
+                    'action' => $segment[1] ?? 'index',
                     'parameters' => [
                         $this->parser->getContainer()
                     ]
@@ -143,10 +157,9 @@ class DefaultRouter implements IRouter
                 );
             }
 
-            //@TODO build parameters
             return [
                 'controller' => $route['controller'],
-                'method' => $route['action'],
+                'action' => $route['action'],
                 'parameters' => [
                     $this->parser->getContainer()
                 ]
@@ -157,46 +170,6 @@ class DefaultRouter implements IRouter
     }
 
     /**
-     * @param $required
-     * @return array
-     * @throws RouterException
-     */
-    private function buildParams($required)
-    {
-        $i = 2;
-        $segment = $this->parser->getContainer()->getSegment()->getPart();
-
-        $params = [];
-        try {
-
-            foreach ($required as $key => $item) {
-                if ($item != IRouter::KEYWORD) {
-                    $repository = new $key();
-
-                    if (in_array(IRepository::class, class_implements($repository))) {
-                        throw new InternalServerError();
-                    }
-                    $params[] = $this->entityFactory->createObject(
-                        new ReflectionClass($item),
-                        $repository->findEntity([
-                            'url' => $segment[$i]
-                        ])
-                    );
-                }
-                $i++;
-            }
-        } catch (ReflectionException $e) {
-            throw new BadRequest();
-        } catch (RepositoryException $e) {
-            throw new NotFound();
-        }
-
-        $params[] = $this->parser->getContainer();
-
-        return $params;
-    }
-
-    /**
      * @param array $keys
      * @param string $segment
      * @return mixed|null
@@ -204,7 +177,7 @@ class DefaultRouter implements IRouter
     private function pregPattern(array $keys, string $segment)
     {
         foreach ($keys as $key) {
-            if (preg_match("/" . addslashes($key) . "/", $segment)) {
+            if (preg_match("/" . addcslashes($key, "/") . "/", $segment)) {
                 return $key;
             }
         }

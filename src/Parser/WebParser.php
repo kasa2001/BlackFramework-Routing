@@ -20,12 +20,20 @@ class WebParser implements IParser
 
     public function parse()
     {
+        $segmentArray = [];
+
+        $segment = trim($_SERVER['REDIRECT_URL'] ?? '', '/');
+
+        if (!empty($segment)) {
+            $segmentArray = explode(
+                '/',
+                $segment
+            );
+        }
+
         $this->container = new WebContainer(
             new Segment(
-                explode(
-                    '/',
-                    trim($_SERVER['REDIRECT_URL'] ?? '', '/')
-                )
+                $segmentArray
             ),
             new Host(
                 $_SERVER['HTTP_HOST']
