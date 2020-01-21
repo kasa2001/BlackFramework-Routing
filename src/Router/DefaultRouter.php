@@ -13,6 +13,7 @@ use BlackFramework\Routing\Parser\WebParser;
 
 use ReflectionClass;
 use ReflectionException;
+use Throwable;
 
 class DefaultRouter implements IRouter
 {
@@ -78,8 +79,9 @@ class DefaultRouter implements IRouter
 
     /**
      * {@inheritDoc}
-     * @throws NotFound if class or method not found
-     * @throws InternalServerError if config or controller is wrong
+     * @throws InternalServerError
+     * @throws NotFound
+     * @throws RouterException
      */
     public function execute($controller, $action, $parameters = [])
     {
@@ -101,9 +103,17 @@ class DefaultRouter implements IRouter
             );
 
             return $object->$action(...$parameters);
-        }  catch (ReflectionException $e) {
+        } catch (RouterException $exception) {
+            throw $exception;
+        } catch (Throwable $e) {
             throw new InternalServerError();
         }
+    }
+
+    public function redirect(string $url)
+    {
+        header("Location: {$url}");
+        die();
     }
 
     /**
@@ -113,7 +123,6 @@ class DefaultRouter implements IRouter
      */
     public function executeException(int $code, string $applicationPath)
     {
-        ob_flush();
         ob_start();
         include $applicationPath . "/public/error/error" . $code . ".html";
         return ob_get_clean();
@@ -124,7 +133,7 @@ class DefaultRouter implements IRouter
      * @param array $segment
      * @param array $query
      * @return array
-     * @throws BadRequest if request is incomplete
+     * @throws RouterException
      */
     private function findRoute(string $method = "GET", array $segment = [], array $query = []): array
     {

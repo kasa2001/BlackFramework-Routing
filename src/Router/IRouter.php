@@ -34,4 +34,11 @@ interface IRouter
      * @return string
      */
     public function executeException(int $code, string $applicationPath);
+
+    /**
+     * Redirect to another page
+     * @param string $url
+     * @return mixed
+     */
+    public function redirect(string $url);
 }

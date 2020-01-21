@@ -25,6 +25,6 @@ class Query implements IPart
 
     public function getElement($key)
     {
-        return $this->query[$key];
+        return $this->query[$key] ?? null;
     }
 }
