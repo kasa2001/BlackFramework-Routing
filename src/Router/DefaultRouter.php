@@ -83,12 +83,12 @@ class DefaultRouter implements IRouter
      * @throws NotFound
      * @throws RouterException
      */
-    public function execute($controller, $action, $parameters = [])
+    public function execute($controller, $method, $parameters = [])
     {
         try {
             $class = new ReflectionClass($controller);
 
-            if (!$class->hasMethod($action)) {
+            if (!$class->hasMethod($method)) {
                 throw new NotFound();
             }
 
@@ -102,7 +102,7 @@ class DefaultRouter implements IRouter
                 $this->configuration['controller-params'][$controller]
             );
 
-            return $object->$action(...$parameters);
+            return $object->$method(...$parameters);
         } catch (RouterException $exception) {
             throw $exception;
         } catch (Throwable $e) {
@@ -117,14 +117,15 @@ class DefaultRouter implements IRouter
     }
 
     /**
-     * @param int $code
+     * @param RouterException $exception
      * @param string $applicationPath
-     * @return false|string
+     * @return string
      */
-    public function executeException(int $code, string $applicationPath)
+    public function executeException(RouterException $exception, string $applicationPath): string
     {
+        header("HTTP/2.0 {$exception->getCode()} {$exception->getMessage()}");
         ob_start();
-        include $applicationPath . "/public/error/error" . $code . ".html";
+        include $applicationPath . "/public/error/error{$exception->getCode()}.html";
         return ob_get_clean();
     }
 
@@ -147,14 +148,7 @@ class DefaultRouter implements IRouter
 
 
             if (!$route) {
-                //Get default controller and method (from URL address)
-                return [
-                    'controller' => $this->configuration['controller-namespace'] . ucfirst($segment[0]),
-                    'action' => $segment[1] ?? 'index',
-                    'parameters' => [
-                        $this->parser->getContainer()
-                    ]
-                ];
+                throw new NotFound();
             }
 
             $queryParams = $route['query'] ?? 0;
