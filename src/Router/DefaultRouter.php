@@ -148,14 +148,7 @@ class DefaultRouter implements IRouter
 
 
             if (!$route) {
-                //Get default controller and method (from URL address)
-                return [
-                    'controller' => $this->configuration['controller-namespace'] . ucfirst($segment[0]),
-                    'action' => $segment[1] ?? 'index',
-                    'parameters' => [
-                        $this->parser->getContainer()
-                    ]
-                ];
+                throw new NotFound();
             }
 
             $queryParams = $route['query'] ?? 0;
