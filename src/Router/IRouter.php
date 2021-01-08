@@ -3,6 +3,8 @@
 
 namespace BlackFramework\Routing\Router;
 
+use BlackFramework\Routing\Exception\RouterException;
+
 interface IRouter
 {
     const KEYWORD = -1;
@@ -29,11 +31,11 @@ interface IRouter
     public function execute($controller, $method, $parameters = []);
 
     /**
-     * @param int $code
+     * @param RouterException $exception
      * @param string $applicationPath
      * @return string
      */
-    public function executeException(int $code, string $applicationPath);
+    public function executeException(RouterException $exception, string $applicationPath): string;
 
     /**
      * Redirect to another page

@@ -117,14 +117,15 @@ class DefaultRouter implements IRouter
     }
 
     /**
-     * @param int $code
+     * @param RouterException $exception
      * @param string $applicationPath
-     * @return false|string
+     * @return string
      */
-    public function executeException(int $code, string $applicationPath)
+    public function executeException(RouterException $exception, string $applicationPath): string
     {
+        header("HTTP/2.0 {$exception->getCode()} {$exception->getMessage()}");
         ob_start();
-        include $applicationPath . "/public/error/error" . $code . ".html";
+        include $applicationPath . "/public/error/error{$exception->getCode()}.html";
         return ob_get_clean();
     }
 
