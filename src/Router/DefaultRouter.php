@@ -83,12 +83,12 @@ class DefaultRouter implements IRouter
      * @throws NotFound
      * @throws RouterException
      */
-    public function execute($controller, $action, $parameters = [])
+    public function execute($controller, $method, $parameters = [])
     {
         try {
             $class = new ReflectionClass($controller);
 
-            if (!$class->hasMethod($action)) {
+            if (!$class->hasMethod($method)) {
                 throw new NotFound();
             }
 
@@ -102,7 +102,7 @@ class DefaultRouter implements IRouter
                 $this->configuration['controller-params'][$controller]
             );
 
-            return $object->$action(...$parameters);
+            return $object->$method(...$parameters);
         } catch (RouterException $exception) {
             throw $exception;
         } catch (Throwable $e) {

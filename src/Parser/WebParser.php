@@ -5,6 +5,7 @@ namespace BlackFramework\Routing\Parser;
 
 
 use BlackFramework\Routing\Container\WebContainer;
+use BlackFramework\Routing\Part\Body;
 use BlackFramework\Routing\Part\Header;
 use BlackFramework\Routing\Part\Host;
 use BlackFramework\Routing\Part\Method;
@@ -46,6 +47,9 @@ class WebParser implements IParser
             ),
             new Header(
                 $this->getAllHeaders()
+            ),
+            new Body(
+                file_get_contents('php://input')
             )
         );
     }

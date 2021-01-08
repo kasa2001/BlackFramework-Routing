@@ -4,6 +4,7 @@
 namespace BlackFramework\Routing\Container;
 
 
+use BlackFramework\Routing\Part\Body;
 use BlackFramework\Routing\Part\Header;
 use BlackFramework\Routing\Part\Host;
 use BlackFramework\Routing\Part\Method;
@@ -38,19 +39,18 @@ class WebContainer implements IContainer
     private $header;
 
     /**
-     * @param Segment $segment
-     * @param Host $host
-     * @param Method $method
-     * @param Query $query
-     * @param Header $header
+     * @var Body
      */
-    public function __construct(Segment $segment, Host $host, Method $method, Query $query, Header $header)
+    private $body;
+
+    public function __construct(Segment $segment, Host $host, Method $method, Query $query, Header $header, Body $body)
     {
         $this->segment = $segment;
         $this->host = $host;
         $this->method = $method;
         $this->query = $query;
         $this->header = $header;
+        $this->body = $body;
     }
 
     /**
@@ -91,6 +91,14 @@ class WebContainer implements IContainer
     public function getHeader(): Header
     {
         return $this->header;
+    }
+
+    /**
+     * @return Body
+     */
+    public function getBody(): Body
+    {
+        return $this->body;
     }
 
 }

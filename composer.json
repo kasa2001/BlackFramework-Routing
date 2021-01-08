@@ -22,5 +22,9 @@
         "psr-4": {
             "Unit\\" : "test/unit/src"
         }
+    },
+    "require": {
+        "ext-json": "*",
+        "php": "^7.1"
     }
 }
