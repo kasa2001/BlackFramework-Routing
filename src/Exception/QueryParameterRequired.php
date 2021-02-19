@@ -3,16 +3,16 @@
 
 namespace BlackFramework\Routing\Exception;
 
-
+use Exception;
 use Throwable;
 
-class PaymentRequired extends RouterException
+class QueryParameterRequired extends Exception
 {
     public function __construct(Throwable $previous = null)
     {
         parent::__construct(
-            self::PAYMENT_REQUIRED_MESSAGE,
-            self::PAYMENT_REQUIRED,
+            RouterException::LACK_OF_QUERY_PARAMETER,
+            RouterException::BAD_REQUEST,
             $previous
         );
     }

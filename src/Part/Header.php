@@ -20,9 +20,9 @@ class Header implements IPart
     }
 
     /**
-     * @return array|mixed
+     * @return array
      */
-    public function getPart()
+    public function getPart(): array
     {
         return $this->header;
     }

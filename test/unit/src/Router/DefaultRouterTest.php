@@ -132,9 +132,4 @@ class DefaultRouterTest extends TestCase
         );
     }
 
-    public function testChoose()
-    {
-
-        $this->assertTrue(true);
-    }
 }

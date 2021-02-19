@@ -20,9 +20,9 @@ class Host implements IPart
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
-    public function getPart()
+    public function getPart(): string
     {
         return $this->host;
     }

@@ -8,13 +8,13 @@ use Throwable;
 
 class BadRequest extends RouterException
 {
-    public function __construct(
-        $message = self::BAD_REQUEST_MESSAGE,
-        $code = self::BAD_REQUEST,
-        Throwable $previous = null
-    )
+    public function __construct(Throwable $previous = null)
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct(
+            self::BAD_REQUEST_MESSAGE,
+            self::BAD_REQUEST,
+            $previous
+        );
     }
 
 }

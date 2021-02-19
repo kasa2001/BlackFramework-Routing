@@ -8,13 +8,13 @@ use Throwable;
 
 class Gone extends RouterException
 {
-    public function __construct(
-        $message = self::GONE_MESSAGE,
-        $code = self::GONE,
-        Throwable $previous = null
-    )
+    public function __construct(Throwable $previous = null)
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct(
+            self::GONE_MESSAGE,
+            self::GONE,
+            $previous
+        );
     }
 
 }
