@@ -18,7 +18,7 @@ class Query implements IPart
         $this->query = $request;
     }
 
-    public function getPart()
+    public function getPart(): array
     {
         return $this->query;
     }

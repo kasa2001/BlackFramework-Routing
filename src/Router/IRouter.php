@@ -33,14 +33,15 @@ interface IRouter
     /**
      * @param RouterException $exception
      * @param string $applicationPath
+     * @param string $type
      * @return string
      */
-    public function executeException(RouterException $exception, string $applicationPath): string;
+    public function executeException(RouterException $exception, string $applicationPath, string $type): string;
 
     /**
      * Redirect to another page
      * @param string $url
-     * @return mixed
+     * @return void
      */
-    public function redirect(string $url);
+    public function redirect(string $url): void;
 }

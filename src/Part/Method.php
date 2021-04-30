@@ -21,7 +21,7 @@ class Method implements IPart
         $this->type = $type;
     }
 
-    public function getPart()
+    public function getPart(): string
     {
         return $this->type;
     }

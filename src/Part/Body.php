@@ -7,7 +7,7 @@ namespace BlackFramework\Routing\Part;
 use function json_decode;
 use function json_last_error;
 
-class Body
+class Body implements IPart
 {
     /**
      * @var object
@@ -19,10 +19,7 @@ class Body
         $this->body = $this->parseBody($body);
     }
 
-    /**
-     * @return object
-     */
-    public function getBody()
+    public function getPart()
     {
         return $this->body;
     }

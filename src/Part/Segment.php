@@ -18,7 +18,7 @@ class Segment implements IPart
         $this->segment = $segment;
     }
 
-    public function getPart()
+    public function getPart(): array
     {
         return $this->segment;
     }

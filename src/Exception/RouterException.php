@@ -48,4 +48,10 @@ class RouterException extends Exception
      */
     const INTERNAL_SERVER_ERROR_MESSAGE = "Internal Server Error";
 
+    /**
+     * Previous exception message
+     */
+    const LACK_OF_QUERY_PARAMETER = "Missing parameter in query";
+    const CONFIGURATION_MISSING = "Check your configuration in route array";
+
 }

@@ -4,13 +4,16 @@
 namespace BlackFramework\Routing\Router;
 
 use BlackFramework\Routing\Exception\BadRequest;
+use BlackFramework\Routing\Exception\ConfigurationRequired;
 use BlackFramework\Routing\Exception\InternalServerError;
+use BlackFramework\Routing\Exception\QueryParameterRequired;
 use BlackFramework\Routing\Exception\RouterException;
 use BlackFramework\Routing\Exception\NotFound;
 use BlackFramework\Routing\Factory\IFactory;
 use BlackFramework\Routing\Parser\IParser;
 use BlackFramework\Routing\Parser\WebParser;
 
+use BadMethodCallException;
 use ReflectionClass;
 use ReflectionException;
 use Throwable;
@@ -66,7 +69,6 @@ class DefaultRouter implements IRouter
      * ['controller-params'] Controller parameters type to create controller class
      * ['default-route'] Default route definition
      * ['controller-namespace'] Controller namespace
-     * default configuration {domain}/{controller}/{method}/{param1}/{param2} ...
      * @param array $configuration
      */
     public function configure(array $configuration): void
@@ -89,11 +91,11 @@ class DefaultRouter implements IRouter
             $class = new ReflectionClass($controller);
 
             if (!$class->hasMethod($method)) {
-                throw new NotFound();
+                throw new InternalServerError(new BadMethodCallException());
             }
 
         } catch (ReflectionException $exception) {
-            throw new NotFound();
+            throw new NotFound($exception);
         }
 
         try {
@@ -103,14 +105,17 @@ class DefaultRouter implements IRouter
             );
 
             return $object->$method(...$parameters);
-        } catch (RouterException $exception) {
-            throw $exception;
         } catch (Throwable $e) {
-            throw new InternalServerError();
+            throw new InternalServerError($e);
         }
     }
 
-    public function redirect(string $url)
+    /**
+     * {@inheritDoc}
+     * @param string $url
+     * @return void
+     */
+    public function redirect(string $url): void
     {
         header("Location: {$url}");
         die();
@@ -119,13 +124,14 @@ class DefaultRouter implements IRouter
     /**
      * @param RouterException $exception
      * @param string $applicationPath
+     * @param string $type
      * @return string
      */
-    public function executeException(RouterException $exception, string $applicationPath): string
+    public function executeException(RouterException $exception, string $applicationPath, string $type = "html"): string
     {
         header("HTTP/2.0 {$exception->getCode()} {$exception->getMessage()}");
         ob_start();
-        include $applicationPath . "/public/error/error{$exception->getCode()}.html";
+        include $applicationPath . "/public/error/error{$exception->getCode()}.{$type}";
         return ob_get_clean();
     }
 
@@ -148,7 +154,9 @@ class DefaultRouter implements IRouter
 
 
             if (!$route) {
-                throw new NotFound();
+                throw new NotFound(
+                    new ConfigurationRequired()
+                );
             }
 
             $queryParams = $route['query'] ?? 0;
@@ -197,7 +205,9 @@ class DefaultRouter implements IRouter
     {
         foreach ($queryParams as $key) {
             if (!in_array($key, $keys)) {
-                throw new BadRequest();
+                throw new BadRequest(
+                    new QueryParameterRequired()
+                );
             }
         }
     }
